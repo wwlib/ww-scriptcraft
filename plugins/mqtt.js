@@ -73,6 +73,26 @@ events.blockBreak( function( event ) {
                  true );
 });
 
+events.blockPlace( function( event ) {
+  var block = event.block;
+  var player_name = event.player.name;
+  var block_type = String(block.type);
+  var message_obj = {
+    event: 'blockPlace',
+    player: player_name,
+    data: {
+      blocktype: block_type,
+      location: {x:block.getX(),y:block.getY(),z:block.getZ()}
+    }
+  }
+
+  var message_obj_str = JSON.stringify(message_obj);
+  client.publish(mqtt_topic,  // topic
+                 message_obj_str, // payload
+                 1,            // QoS (1 is send at least once)
+                 true );
+});
+
 events.playerJoin( function( event ) {
   console.log('mqtt.js: events.playerJoin', event.player);
   console.log( event.player, 'Welcome to the server!' );
