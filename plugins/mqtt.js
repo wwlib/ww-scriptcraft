@@ -5,8 +5,12 @@ var client = mqtt.client('tcp://test.mosquitto.org:1883','TestClient'); // defau
 var mqtt_topic = 'jmgx/all';
 client.connect();
 
+var message_obj = {
+  event: 'scriptcraftMqttReady'
+}
+var message_obj_str = JSON.stringify(message_obj);
 client.publish(mqtt_topic,  // topic
-               'ready', // payload
+               message_obj_str, // payload
                1,            // QoS (1 is send at least once)
                true );       // broker should retain message
 
@@ -24,49 +28,16 @@ client.publish(mqtt_topic,  // topic
 // } );
 
 events.blockBreak( function( event ) {
-  console.log('mqtt.js: blockBreak');
-  console.log(event.player);
-  console.log('You broke a block!' );
-
   var block = event.block;
-  console.log('Block:');
-  console.log(block);
-
-  var player_name = event.player.name;
-  console.log("Player name:");
-  console.log(player_name);
-
-  var block_type = String(block.type);
-  console.log("Block type:");
-  console.log(block_type);
-
-  console.log("Block Stringified");
-  try {
-    console.log(JSON.stringify(block));
-  } catch (error) {
-    console.log("Error: ");
-    console.log(error);
-  }
-
-  for (var p in event) {
-    console.log(p);
-  }
-
   var message_obj = {
     event: 'blockBreak',
-    player: player_name,
+    player: event.player.name,
     data: {
-      blocktype: block_type,
+      blocktype: block.type,
       location: {x:block.getX(),y:block.getY(),z:block.getZ()}
     }
   }
-
-  console.log('Message Object:');
-  console.log(message_obj);
-
   var message_obj_str = JSON.stringify(message_obj);
-  console.log(message_obj_str);
-
   client.publish(mqtt_topic,  // topic
                  message_obj_str, // payload
                  1,            // QoS (1 is send at least once)
@@ -94,10 +65,123 @@ events.blockPlace( function( event ) {
 });
 
 events.playerJoin( function( event ) {
-  console.log('mqtt.js: events.playerJoin', event.player);
-  console.log( event.player, 'Welcome to the server!' );
+  console.log('mqtt.js: event.playerJoin', event.player);
+  var player_name = event.player.name;
+  var message_obj = {
+    event: 'playerJoin',
+    player: player_name
+  }
+  var message_obj_str = JSON.stringify(message_obj);
   client.publish(mqtt_topic,  // topic
-                 'playerJoin', // payload
+                 message_obj_str, // payload
                  1,            // QoS (1 is send at least once)
                  true );
 });
+
+events.playerQuit( function( event ) {
+  console.log('mqtt.js: event.playerQuit', event.player);
+  var player_name = event.player.name;
+  var message_obj = {
+    event: 'playerQuit',
+    player: player_name
+  }
+  var message_obj_str = JSON.stringify(message_obj);
+  client.publish(mqtt_topic,  // topic
+                 message_obj_str, // payload
+                 1,            // QoS (1 is send at least once)
+                 true );
+});
+
+// events.playerDeath( function( event ) {
+//   console.log('playerDeath:' + event.entity);
+//   var message_obj = {
+//     event: 'playerDeath',
+//     entity: event.entity
+//   }
+//   var message_obj_str = JSON.stringify(message_obj);
+//   client.publish(mqtt_topic,  // topic
+//                  message_obj_str, // payload
+//                  1,            // QoS (1 is send at least once)
+//                  true );
+// });
+
+function onPlayerInteractEntity(event) {
+    var message_obj = {
+      event: 'playerInteractEntity',
+      player: event.player.name,
+      clickedEntity: event.clickedEntity
+    }
+    var message_obj_str = JSON.stringify(message_obj);
+    client.publish(mqtt_topic,  // topic
+                   message_obj_str, // payload
+                   1,            // QoS (1 is send at least once)
+                   true );
+}
+events.playerInteractEntity(onPlayerInteractEntity);
+
+function onPlayerEggThrow(event) {
+    var message_obj = {
+      event: 'playerEggThrow',
+      player: event.player.name
+    }
+    var message_obj_str = JSON.stringify(message_obj);
+    client.publish(mqtt_topic,  // topic
+                   message_obj_str, // payload
+                   1,            // QoS (1 is send at least once)
+                   true );
+}
+events.playerEggThrow(onPlayerEggThrow);
+
+
+function onPlayerBedEnter(event) {
+    var message_obj = {
+      event: 'playerBedEnter',
+      player: event.player.name
+    }
+    var message_obj_str = JSON.stringify(message_obj);
+    client.publish(mqtt_topic,  // topic
+                   message_obj_str, // payload
+                   1,            // QoS (1 is send at least once)
+                   true );
+}
+events.playerBedEnter(onPlayerBedEnter);
+
+function onPlayerBedLeave(event) {
+    var message_obj = {
+      event: 'playerBedLeave',
+      player: event.player.name
+    }
+    var message_obj_str = JSON.stringify(message_obj);
+    client.publish(mqtt_topic,  // topic
+                   message_obj_str, // payload
+                   1,            // QoS (1 is send at least once)
+                   true );
+}
+events.playerBedLeave(onPlayerBedLeave);
+
+
+function onPlayerFish(event) {
+    var message_obj = {
+      event: 'playerFish',
+      player: event.player.name
+    }
+    var message_obj_str = JSON.stringify(message_obj);
+    client.publish(mqtt_topic,  // topic
+                   message_obj_str, // payload
+                   1,            // QoS (1 is send at least once)
+                   true );
+}
+events.playerFish(onPlayerFish);
+
+function onCraftItem(event) {
+    var message_obj = {
+      event: 'craftItem',
+      transaction: event.transaction
+    }
+    var message_obj_str = JSON.stringify(message_obj);
+    client.publish(mqtt_topic,  // topic
+                   message_obj_str, // payload
+                   1,            // QoS (1 is send at least once)
+                   true );
+}
+events.craftItem(onCraftItem);
