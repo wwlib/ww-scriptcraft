@@ -6,15 +6,15 @@ var Drone = require('drone');
 
 
 var mqtt = require('sc-mqtt');
-var client = mqtt.client('tcp://test.mosquitto.org:1883','ScMcServerClient'); // default is localhost 1883
+var client = mqtt.client('tcp://test.mosquitto.org:1883'); //,'ScMcServerClient'); // default is localhost 1883
 //var client = mqtt.client('tcp://mqtt.sunny72.com:25780','ScMcServerClient'); // default is localhost 1883
 
 var playerMovePreviousTime = 0;
 
-var mqtt_topic = 'jmgx/all';
+var mqtt_topic = 'jmgx/from_server';
 client.connect();
 
-client.subscribe('jmgx/inbound');
+client.subscribe('jmgx/to_server');
 
 client.onMessageArrived(function(topic, message){
    // handle incoming messages here.
